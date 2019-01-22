@@ -1,0 +1,50 @@
+This is BibTeX, Version 0.99d (TeX Live 2018/dev/Debian)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: report.aux
+The style file: plain.bst
+Database file #1: report.bib
+Warning--empty journal in basile2014enhanced
+Warning--empty journal in kilgarriff2000english
+Warning--empty journal in ramos2003using
+You've used 4 entries,
+            2118 wiz_defined-function locations,
+            521 strings with 4807 characters,
+and the built_in function-call counts, 1680 in all, are:
+= -- 169
+> -- 72
+< -- 2
++ -- 29
+- -- 24
+* -- 109
+:= -- 261
+add.period$ -- 12
+call.type$ -- 4
+change.case$ -- 23
+chr.to.int$ -- 0
+cite$ -- 7
+duplicate$ -- 69
+empty$ -- 126
+format.name$ -- 24
+if$ -- 361
+int.to.chr$ -- 0
+int.to.str$ -- 4
+missing$ -- 4
+newline$ -- 23
+num.names$ -- 8
+pop$ -- 28
+preamble$ -- 1
+purify$ -- 19
+quote$ -- 0
+skip$ -- 62
+stack$ -- 0
+substring$ -- 129
+swap$ -- 24
+text.length$ -- 2
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 16
+warning$ -- 3
+while$ -- 17
+width$ -- 5
+write$ -- 43
+(There were 3 warnings)

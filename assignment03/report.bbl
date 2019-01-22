@@ -1,0 +1,26 @@
+\begin{thebibliography}{1}
+
+\bibitem{basile2014enhanced}
+Pierpaolo Basile, Annalina Caputo, and Giovanni Semeraro.
+\newblock An enhanced lesk word sense disambiguation algorithm through a
+  distributional semantic model.
+\newblock pages 1591--1600, 2014.
+
+\bibitem{kilgarriff2000english}
+Adam Kilgarriff and Joseph Rosenzweig.
+\newblock English senseval: Report and results.
+\newblock 6:2, 2000.
+
+\bibitem{mikolov2013distributed}
+Tomas Mikolov, Ilya Sutskever, Kai Chen, Greg~S Corrado, and Jeff Dean.
+\newblock Distributed representations of words and phrases and their
+  compositionality.
+\newblock In {\em Advances in neural information processing systems}, pages
+  3111--3119, 2013.
+
+\bibitem{ramos2003using}
+Juan Ramos et~al.
+\newblock Using tf-idf to determine word relevance in document queries.
+\newblock 242:133--142, 2003.
+
+\end{thebibliography}

@@ -1,0 +1,2 @@
+baseline,lesk_official,custom:lesk,custom:lesk+tidf,custom:lesk+syns,custom:lesk+word
+49.37931034482759,25.862068965517242,43.6551724137931,0.0,43.37931034482759,32.827586206896555

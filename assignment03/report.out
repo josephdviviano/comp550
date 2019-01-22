@@ -1,0 +1,12 @@
+\BOOKMARK [1][-]{section.1}{1.\040Lambda\040Calculus\040and\040Compositional\040Semantics}{}% 1
+\BOOKMARK [2][-]{subsection.1.1}{1.1.\040a.}{section.1}% 2
+\BOOKMARK [2][-]{subsection.1.2}{1.2.\040b.}{section.1}% 3
+\BOOKMARK [2][-]{subsection.1.3}{1.3.\040c}{section.1}% 4
+\BOOKMARK [1][-]{section.2}{2.\040Lesk's\040Algorithm}{}% 5
+\BOOKMARK [2][-]{subsection.2.1}{2.1.\040General\040Approach}{section.2}% 6
+\BOOKMARK [2][-]{subsection.2.2}{2.2.\040Baseline\040Models}{section.2}% 7
+\BOOKMARK [2][-]{subsection.2.3}{2.3.\040Simplified\040Lesk}{section.2}% 8
+\BOOKMARK [2][-]{subsection.2.4}{2.4.\040Distributional\040Signal:\040Synset\040sense\040frequencies\040in\040our\040corpus}{section.2}% 9
+\BOOKMARK [2][-]{subsection.2.5}{2.5.\040Word\040Embedding\040Signal:\040Cosine\040Distance\040Between\040Word2Vec\040Embeddings.}{section.2}% 10
+\BOOKMARK [2][-]{subsection.2.6}{2.6.\040Conclusion}{section.2}% 11
+\BOOKMARK [1][-]{section*.1}{References}{}% 12

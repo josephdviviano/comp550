@@ -1,0 +1,213 @@
+%&pdflatex                                                                      
+%% filename: amsart-template.tex, version: 2.1                                  
+\documentclass{amsart}                                                          
+\usepackage{hyperref}                                                           
+\usepackage{inputenc}                                                           
+\usepackage{graphicx}                                                           
+\usepackage{bbm}                                                                
+\usepackage{csvsimple}   
+\usepackage{bibliography}                                                       
+                                                                                
+\newtheorem{theorem}{Theorem}[section]                                          
+\newtheorem{lemma}[theorem]{Lemma}                                              
+\theoremstyle{definition}                                                       
+\newtheorem{definition}[theorem]{Definition}                                    
+\newtheorem{example}[theorem]{Example}                                          
+\newtheorem{xca}[theorem]{Exercise}                                             
+\theoremstyle{remark}                                                           
+\newtheorem{remark}[theorem]{Remark}                                            
+\numberwithin{equation}{section}                                                
+\setlength{\parindent}{0pt} % turn off auto-indent                              
+                                                                                
+\graphicspath{ {./} }                                                           
+                                                                                
+\begin{document}                                                                
+                                                                                
+\title{Assignment 3: [COMP550]}                                                 
+                                                                                
+\author{Joseph D. Viviano}                                                      
+\address{McGill University}                                                     
+\curraddr{}                                                                     
+\email{joseph@viviano.ca}                                                                                                                                                                                                                                                                                                    
+\thanks{}                                                                       
+\date{Sept 2018}                                                                
+                                                                                
+\maketitle                                                                      
+
+\section{Lambda Calculus and Compositional Semantics}
+
+\subsection{a.}
+
+\begin{equation}
+\begin{split}
+	(\lambda x. xx)(\lambda y. yx) z 
+	=& (\lambda y. y x) (\lambda y. y x) z\\
+	=& (\lambda y. y x) xz \\
+	=& xxz \\
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+	(\lambda uvw.wvu)aa(\lambda pq. q) z 
+	=& (\lambda pq. q) aa\\
+	=& a \\
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+	[(\lambda v.vv)(\lambda u. u)] [(\lambda v.v)(\lambda v.w)]
+	=& [(\lambda u.u)(\lambda u. u)](\lambda v.w)\\
+	=&  (\lambda u.u)(\lambda v. w)\\
+	=& (\lambda v. w)
+\end{split}
+\end{equation}
+
+\subsection{b.}: \texttt{DET -> no}, and \texttt{V -> hates} \\
+
+\textbf{No} says that none of the objects with attribute $P$ also have attribute $Q$, or "for all $x$, such that $x$ is also $P$, $x$ is not $Q$."\\
+
+\begin{equation}	
+    \lambda P. \lambda Q. \forall x. P(x) \rightarrow  \neg Q(x)
+\end{equation}
+
+\textbf{Hates}, a verb, denotes an event $e$:\textit{something is hated}. This requires a \textit{hater} $z$ at said event, and a \textit{hatee} $x$ at said event: \\
+
+\begin{equation}
+	\lambda w. \lambda z. w[\forall x. \exists e~ hates(e) \land hater(e,z) \land hatee(e, x)]
+\end{equation}
+
+
+
+\subsubsection{A parsing tree.} Let \texttt{A} $\equiv \lambda z.\exists e. ~hates(e)\land hater(e, z) \land hatee(e, COMP550)$ \\
+
+The semantics of $S$ are as follows: \\
+
+\begin{equation}
+    \begin{split}
+         \lambda Q.& \forall x. student(x)\rightarrow \neg Q(x)](A)\\
+      =& \lambda Q.  \forall x. student(x)\rightarrow \neg A(x)\\
+      =& \lambda Q.  \forall x. student(x)\rightarrow \neg [\lambda z.\exists e. ~hates(e)\land hater(e, z) \land hatee(e, COMP550)](x)\\
+      =& \lambda Q.  \forall x. student(x)\rightarrow \neg [\exists e. ~hates(e)\land hater(e, X) \land hatee(e, COMP550)\\
+    \end{split}
+\end{equation}
+
+\texttt{S}$~~~~<\lambda Q. \forall x. student(x)\rightarrow \neg \exists e. ~hates(e)\land hater(e, X) \land hatee(e, COMP550)>$\\
+\texttt{S -> NP VP}\\
+
+\texttt{NP}$~~~~<\lambda P. \lambda Q. \forall x. student(x)\rightarrow \neg Q(x)>$\\
+\texttt{NP -> DET N}\\
+
+\texttt{DET}$~~~~<\lambda P. \lambda Q. \forall x. P(x)\rightarrow \neg Q(x)>$\\
+\texttt{DET -> no}\\
+
+\texttt{N}$~~~~<\lambda x. student(x)>$\\
+\texttt{N-> student}\\
+
+\texttt{VP}$~~~~<\lambda z.\exists e. ~hates(e)\land hater(e, z) \land hatee(e, COMP550)>$\\
+\texttt{VP -> V PN}\\
+
+\texttt{V}$~~~~<\lambda w. \lambda z. w[\forall x. \exists e~ hates(e) \land hater(e,z) \land hatee(e, x)]>$\\
+\texttt{V -> hates}\\
+
+\texttt{PN}$~~~~<\lambda X. x(COMP550)>$\\
+\texttt{PN -> COMP550}\\
+
+\subsection{c}: The representation of wants is: \\
+
+\begin{equation}
+    \exists e wants(e) \land wanter(e, s_1) \land wantee(e, s_2)
+\end{equation}
+
+One interpretation is to start by looking at $s_1$, the predicate \textit{there is an exam $y$ that is wanted by $s_1$} which then follow by \textit{for each student $x$, negate this predicate over $s_1$}: \\
+
+\begin{equation}
+\begin{split}
+	(\lambda Q.& \exists y. exam(y) \land Q(y))(\lambda s_2. \exists e. wants(e) \land wanter(e, s_1) \land wantee(e, s_2))\\ 
+	=& \exists y. exam(y) \land \exists e. want(e) \land wanter(e, s_1) \land wantee(e, y) 
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+(\lambda Q.& \forall x. student(x)\rightarrow \neg Q(x))(\lambda s_1. \exists y. exam(y) \land \exists e. want(e) \land wanter(e, s_1) \land wantee(e, y)) \\
+=& \forall x. student(x) \rightarrow \neg [\lambda s_1.\exists y. exam(y) \land \exists e. want(e) \land wanter(e, s_1) \land wantee(e, y)](x) \\
+=& \forall x. student(x) \rightarrow \neg \exists y. exam(y) \land \exists e. want(e) \land wanter(e, x) \land wantee(e, y) \\
+\end{split}
+\end{equation}
+
+Interpretation 1: There is no exam  anywhere that any students want.\\
+
+A second interpretation follows from starting with $s_2$: \textit{There is an object $s_2$ that is not wanted by any student $x$}, and then set the object to be the exam $y$, which can have property $Q$ (not being wanted). \\
+
+\begin{equation}
+\begin{split}
+(\lambda Q.& \forall x. student(x)\rightarrow \neg Q(x))(\lambda s_1. \exists e. want(e) \land wanter(e, s_1) \land wantee(e, s_2)) \\
+=& \forall x. student(x) \rightarrow \neg (\exists e. want(e)\land wanter(e, x) \land wantee(e, s_2)) \\
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+(\lambda Q.& \exists y. exam(y) \land Q(y))(\lambda s_2. \forall x. student(x) \rightarrow \neg (\exists e. want(e)\land wanter(e, x) \land wantee(e, s_2)))\\ 
+=& (\exists y. exam(y)) \land [\forall x. student(x) \rightarrow \neg (\exists e. want(e)\land wanter(e, x) \land wantee(e, y))]
+\end{split}
+\end{equation}
+
+\section{Lesk's Algorithm}
+
+\subsection{General Approach}
+
+For all experiments, I worked with a development set of $n=194$ and a test set of $n=1450$. Hyperparameter tuning was accomplished using randomized search with (100 trials), picking random values for all hyperparameters between $0 < \lambda < 1$. 
+
+\subsection{Baseline Models}
+
+The baseline (the \#1 sense as indicated by WordNet) substantially outperformed NLTK's built-in Lesk algorithm on the dev set (50.25\% accuracy vs. 26.80\% accuracy) and test set (49.38\% vs. 25.86\%). This is likely because WordNet ranks word senses by their likelihood in real text, so it is reasonable that the most likely sense is a strong baseline. Furthermore, the Lesk algorithm is not well-equipped to deal with limited context, e.g., \textit{'d001.s029.t001: The Heavyweights are coming'}.
+
+\subsection{Simplified Lesk}
+
+To address this, I developed 2 approaches built on top of the simplified Lesk algorithm. Simplified Lesk algorithm \cite{kilgarriff2000english} uses, for each lemma $l_i$, the entire sentence minus the lemma as context $c_i$, instead of a using fixed context window size around the lemma. It also expands the glossary $g_i$ to include all available examples from each considered synset $s_i$, and if no good candidate $s_i$ is found, defaults to using the \#1 sense indicated by WordNet. This approach performs close to baseline (dev set: 45.36\%, test set: 43.66\%), likely due to the initialization. As is standard, this algorithm selects the sense with maximal overlap between $c_i$ and $g_i$. No hyperparameter tuning was performed.
+
+\subsection{Distributional Signal: Synset sense frequencies in our corpus}
+
+To incorporate distributional information, I sought to incorporate distributional information regarding the distribution of \textit{synset sense frequencies appearing in our corpus}. To do this, I extracted the lemma counts from all lemmas and all synsets. Then, I normalized these lemma counts by the inverse frequency of the word occurrence in our corpus $S$ (tf-idf \cite{ramos2003using}). I used Laplace smoothing to deal with 0 counts. Therefore for each sense frequency $f_i$:
+
+\begin{equation}
+    f_i = \frac{\#lemma_i + 1}{S_i + |lemma|}
+\end{equation}
+
+This distributional signal $D$ was then used to weigh the candidacy of each synset under consideration,the multiplied by a tuning hyperparameter $\lambda_D$. To facilitate the mixing of this signal and the simplified Lesk signal $L$, I introduced a second hyperparameter $\lambda_L$. Therefore the total candidacy score $C$ for a synset is calculated as:
+
+\begin{equation}
+    C = \lambda_L * overlap(c_i, g_i) + \lambda_D + getSynsetFreqs(s_i)  
+\end{equation} 
+
+I found reasonable settings of $\lambda_L$ and $\lambda_D$ using randomized search as detailed above. \\
+
+I tried defining the corpus as all the words in all the definitions of our development set, but this produced poor scores on the test set due to overfitting (recall the dev set is small). As a follow up, I defined the corpus as the entire SemCor corpus, as in previous work \cite{basile2014enhanced}, which hopefully gives a more general estimate of word frequencies in text. The randomized search found a best dev set accuracy of 38.66\%, $\lambda_L=0.071$, and $\lambda_D=0.65$. Test set performance with these parameters was 43.38\%. It is interesting that this method performs so much better on the test set, likely due to the larger corpus used in learning synset distributions, but disappointing that it under-performs both the baseline and simplified Lesk implementation.
+
+\subsection{Word Embedding Signal: Cosine Distance Between Word2Vec Embeddings.}
+
+As a second attempt at incorporating outside distributional signals into our model, I turned to Google's pretrained Word2Vec model \cite{mikolov2013distributed}. Briefly, I built our $c_i$, $g_i$, and corpus $S$ as normal. Then, to compute the overlap between the two, I took the mean word vector across all context and glossary words weighted by their inverse frequency in the corpus $f_k$: 
+
+\begin{equation}
+    V_c = \frac{1}{|c_i|} \sum_{k=1}^{|c_i|} getEmbedding(c_i^{(k)}) f_k \quad
+    V_g = \frac{1}{|g_i|} \sum_{k=1}^{|g_i|} getEmbedding(g_i^{(k)}) f_k
+\end{equation}
+
+And then computed the cosine distance between these weighted mean vectors. The intention here is to capture information distributional information about word co-occurrence that may occur outside the dev-set distribution to correctly classify senses. As before, I used a hyperparameter $\lambda_W$ to control the contribution of this embedding signal. Therefore the total candidacy score $C$ for a synset is calculated as:
+
+\begin{equation}
+    C = \lambda_L * overlap(c_i, g_i) + \lambda_W + embeddingSimilarity(c_i, g_i)  
+\end{equation} 
+
+The hyperparameter search yielded an accuracy of 33.51\% on the dev set, with $\lambda_L=0.060$ and $\lambda_W=0.72$. Test set accuracy was 32.83\%. Both scores far below the baseline and basic lesk. I hypothesize that this method is too powerful for it's own good -- taking into account lots of word co-occourances that do not appear in either the dev set or test set, and therefore misleading the lesk algorithm. I suspect building a word embedding directly on the dev set would perform better, although I am skeptical of this as well, because the dev set was very small.
+
+\subsection{Conclusion}: I failed to outperform the baseline, which made use of the human knowledge about word-sense likelihoods built into WordNet. This points to the correct successful methods for word sense disambiguation requiring more external information regarding language usage patterns their relationships to senses. I suspect a model that uses word sense probabilities, as shown, mixed with word embeddings trained on the dev corpus, to likely perform better than the results presented here. A larger development set would also be invaluable for being able to tune hyperparameters that generalize to the test set well.
+
+\bibliographystyle{plain}
+\bibliography{report}
+
+\end{document}
+

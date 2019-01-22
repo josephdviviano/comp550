@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>
+    
+      Google's trained Word2Vec model in Python &middot; Chris McCormick
+    
+  </title>
+
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-precomposed.png">
+  <link rel="shortcut icon" href="/public/favicon.ico">
+  <link rel="alternate" type="application/atom+xml" title="Chris McCormick" href="/atom.xml">
+
+  <!-- Adding support for MathJax -->
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
+</head>
+
+
+  <body>
+
+    <div class="container content">
+      <header class="masthead">
+        <h3 class="masthead-title">
+          <a href="/" title="Home">Chris McCormick</a>
+
+          <!--- Display the About, Archive, etc. pages in the header --->
+          
+              &nbsp;&nbsp;&nbsp;<small><a href="/about/">About</a></small>
+          
+              &nbsp;&nbsp;&nbsp;<small><a href="/tutorials/">Tutorials</a></small>
+          
+              &nbsp;&nbsp;&nbsp;<small><a href="/archive/">Archive</a></small>
+          
+
+        </h3>
+        <!---- I could use this to include the tag line, but it looks cluttered...
+        <h3 class="masthead-title">
+             <small>Machine Learning Tutorials and Insights</small>
+        </h3>
+        ----->
+
+      </header>
+
+      <main>
+        <article class="post">
+  <h1 class="post-title">Google's trained Word2Vec model in Python</h1>
+  <time datetime="2016-04-12T23:00:00-07:00" class="post-date">12 Apr 2016</time>
+  <p>In this post I’m going to describe how to get Google’s <em>pre-trained</em> Word2Vec model up and running in Python to play with.</p>
+
+<p>As an interface to word2vec, I decided to go with a Python package called gensim. gensim appears to be a popular NLP package, and has some nice documentation and tutorials, including for word2vec.</p>
+
+<p>You can download Google’s pre-trained model <a href="https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit?usp=sharing" title="Google's pre-trained Word2Vec model">here</a>. It’s 1.5GB! It includes word vectors for a vocabulary of 3 million words and phrases that they trained on roughly 100 billion words from a Google News dataset. The vector length is 300 features.</p>
+
+<p>Loading this model using gensim is a piece of cake; you just need to pass in the path to the model file (update the path in the code below to wherever you’ve placed the file).</p>
+
+<figure class="highlight"><pre><code class="language-py" data-lang="py"><span class="kn">import</span> <span class="nn">gensim</span>
+
+<span class="c"># Load Google's pre-trained Word2Vec model.</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">gensim</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Word2Vec</span><span class="o">.</span><span class="n">load_word2vec_format</span><span class="p">(</span><span class="s">'./model/GoogleNews-vectors-negative300.bin'</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>  </code></pre></figure>
+
+<p>However, if you’re running 32-bit Python (like I was) you’re going to get a memory error!</p>
+
+<p>This is because gensim allocates a big matrix to hold all of the word vectors, and if you do the math…</p>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text">3 million words * 300 features * 4bytes/feature = ~3.35GB</code></pre></figure>
+
+<p>…that’s a big matrix!</p>
+
+<p>Assuming you’ve got a 64-bit machine and a decent amount of RAM (I’ve got 16GB; maybe you could get away with 8GB?), your best bet is to switch to 64-bit Python. I had a little trouble with this–see my notes down at the end of the post.</p>
+
+<h1 id="inspecting-the-model">Inspecting the Model</h1>
+<p>I have a small Python project on GitHub called <a href="https://github.com/chrisjmccormick/inspect_word2vec">inspect_word2vec</a> that loads Google’s model, and inspects a few different properties of it.</p>
+
+<p>If you’d like to browse the 3M word list in Google’s pre-trained model, you can just look at the text files in the <a href="https://github.com/chrisjmccormick/inspect_word2vec/tree/master/vocabulary">vocabulary folder</a> of that project. I split the word list across 50 files, and each text file contains 100,000 entries from the model. I split it up like this so your editor wouldn’t completely choke (hopefully) when you try to open them. The words are stored in their original order–I haven’t sorted the list alphabetically. I don’t know what determined the original order.</p>
+
+<p>Here are some the questions I had about the vocabulary, which I answered in this project:</p>
+
+<ul>
+  <li>Does it include stop words?
+    <ul>
+      <li>Answer: Some stop words like “a”, “and”, “of” are <em>excluded</em>, but others like “the”, “also”, “should” are <em>included</em>.</li>
+    </ul>
+  </li>
+  <li>Does it include misspellings of words?
+    <ul>
+      <li>Answer: Yes. For instance, it includes both “mispelled” and “misspelled”–the latter is the correct one.</li>
+    </ul>
+  </li>
+  <li>Does it include commonly paired words?
+    <ul>
+      <li>Answer: Yes. For instance, it includes “Soviet_Union” and “New_York”.</li>
+    </ul>
+  </li>
+  <li>Does it include numbers?
+    <ul>
+      <li>Answer: Not directly; e.g., you won’t find “100”. But it does include entries like “###MHz_DDR2_SDRAM” where I’m assuming the ‘#’ are intended to match any digit.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Here’s a selection of 30 “terms” from the vocabulary. Pretty weird stuff in there!</p>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text">Al_Qods
+Surendra_Pal
+Leaflet
+guitar_harmonica
+Yeoval
+Suhardi
+VoATM
+Streaming_Coverage
+Vawda
+Lisa_Vanderpump
+Nevern
+Saleema
+Saleemi
+rbracken@centredaily.com
+yellow_wagtails
+P_&amp;C;
+CHICOPEE_Mass._WWLP
+Gardiners_Rd
+Nevers
+Stocks_Advance_Paced
+IIT_alumnus
+Popery
+Kapumpa
+fashionably_rumpled
+WDTV_Live
+ARTICLES_##V_##W
+Yerga
+Weegs
+Paris_IPN_Euronext
+##bFM_Audio_Simon</code></pre></figure>
+
+<h1 id="64-bit-python-on-windows">64-bit Python on Windows</h1>
+<p>It took me some effort get a 64-bit Python setup with gensim up and running, so I thought I’d share my steps.</p>
+
+<p>I had been using Python(x, y) to get a nice machine learning-oriented Python environment up and running. However, there doesn’t appear to be a 64-bit release of Python(x, y) yet…</p>
+
+<p>I found a package called WinPython that does include 64-bit support. It looks to be actively supported, and includes all of the features I cared about from Python(x, y) (it includes the Spyder IDE and scikit-learn with all its dependencies).</p>
+
+<p>Head over to the homepage for WinPython <a href="https://winpython.github.io/" title="WinPython homepage">here</a>. I initially tried WinPython for Python 3.5, but ran into some issues, and ended up just going with Python 2.7, which worked fine!</p>
+
+<p>You may already have this, but for Python 2.7 you will need the <a href="https://www.microsoft.com/en-us/download/details.aspx?id=15336" title="VS C++ 2008 Redistributable">Microsoft Visual C++ 2008 Redistributable Package (x64)</a>.</p>
+
+<p>I’m using the following version: <a href="https://sourceforge.net/projects/winpython/files/WinPython_2.7/2.7.10.3/WinPython-64bit-2.7.10.3.exe/download" title="Download on SourceForge">WinPython-64bit-2.7.10.3</a></p>
+
+<p>You can extract WinPython wherever you want; I put mine right under C:.</p>
+
+<p>WinPython doesn’t put itself in the Windows registry or on the system path; however, it does include some batch scripts for doing this. Look under <code class="highlighter-rouge">C:\WinPython-64bit-3.5.1.2\scripts\</code> and you’ll find <code class="highlighter-rouge">env.bat</code> and <code class="highlighter-rouge">register_python.bat</code>.</p>
+
+<p>Open a Windows command prompt and run those two batch scripts. Then, in the same command window, you can install gensim easily by executing the following on the command line: <code class="highlighter-rouge">easy_install -U gensim</code></p>
+
+<p>That should do it! With any luck, you should now be able to run the Python code at the top of the post to import Google’s model.</p>
+
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Responsive Unit - End of Post, Colorful -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-9176681289361741"
+     data-ad-slot="8514028518"
+     data-ad-format="auto"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+  
+  
+  <div id="disqus_thread"></div>
+  <script>
+  
+      var disqus_config = function () {
+          this.page.url = "http://mccormickml.com/2016/04/12/googles-pretrained-word2vec-model-in-python/"
+          this.page.identifier = "/2016/04/12/googles-pretrained-word2vec-model-in-python/"
+      };
+      
+      var disqus_shortname = 'mccormickml';
+      // var disqus_developer = 1; // Comment out when the site is live
+      var disqus_title      = 'Google's trained Word2Vec model in Python';
+      
+      (function() {  // DON'T EDIT BELOW THIS LINE
+          var d = document, s = d.createElement('script');
+          
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';        
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+  
+  
+</article>
+
+
+<aside class="related">
+  <h3>Related posts</h3>
+  <ul class="related-posts">
+    
+      <li>
+        <a href="/2018/06/15/applying-word2vec-to-recommenders-and-advertising/">
+          Applying word2vec to Recommenders and Advertising
+          <small><time datetime="2018-06-15T08:00:00-07:00">15 Jun 2018</time></small>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/2017/10/22/product-quantizer-tutorial-part-2/">
+          Product Quantizers for k-NN Tutorial Part 2
+          <small><time datetime="2017-10-22T08:00:00-07:00">22 Oct 2017</time></small>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/2017/10/13/product-quantizer-tutorial-part-1/">
+          Product Quantizers for k-NN Tutorial Part 1
+          <small><time datetime="2017-10-13T08:00:00-07:00">13 Oct 2017</time></small>
+        </a>
+      </li>
+    
+  </ul>
+</aside>
+
+
+      </main>
+      
+      <footer class="footer">
+        <small>
+          &copy; <time datetime="2018-09-05T11:56:48-07:00">2018</time>. All rights reserved.
+        </small>
+      </footer>
+    </div>
+
+    
+     <script>
+       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+       ga('create', 'UA-76624103-1', 'auto');
+       ga('send', 'pageview');
+     </script>
+    
+  </body>
+</html>

@@ -1,0 +1,95 @@
+S -> NP VP    % 'le chat mange le poisson'
+S -> NP VP S  % 'le chat noir mange le poisson'
+S -> VP NP    % 'il regarde la télévision / jackie regarde la television'
+S -> VP       % direct object pronouns
+S -> NP
+
+NP -> PN                            % 'jackie'
+NP -> DT-M-SG N-M-SG                % 'le chat'
+NP -> DT-F-SG N-F-SG                % 'la television'
+NP -> DT-PL   N-PL                  % 'les televisions'
+
+NP -> DT-PL   A-M-SG-PRE  N-M-SG    % 'les beau chats'
+NP -> DT-PL   A-F-SG-PRE  N-F-SG    %
+NP -> DT-PL   A-M-PL-PRE  N-M-PL    %
+NP -> DT-PL   A-F-PL-PRE  N-F-PL    %
+
+NP -> DT-PL   N-M-SG   A-M-SG-POST  % 'les chats noir'
+NP -> DT-PL   N-F-SG   A-F-SG-POST  %
+NP -> DT-PL   N-M-PL   A-M-PL-POST  %
+NP -> DT-PL   N-F-PL   A-F-PL-POST  %
+
+VP -> V-1-SG  % eat
+VP -> V-2-SG  %
+VP -> V-3-SG  %
+VP -> V-1-PL  %
+VP -> V-2-PL  %
+VP -> V-3-PL  %
+
+VP -> PR-1-SG V-1-SG % he eats
+VP -> PR-2-SG V-2-SG %
+VP -> PR-3-SG V-3-SG %
+VP -> PR-1-PL V-1-PL %
+VP -> PR-2-PL V-2-PL %
+VP -> PR-3-PL V-3-PL %
+
+VP -> PR-1-SG DOPR-1-SG V-1-SG % je t'aime
+VP -> PR-2-SG DOPR-2-SG V-2-SG %
+VP -> PR-3-SG DOPR-3-SG V-3-SG %
+VP -> PR-1-PL DOPR-1-PL V-1-PL %
+VP -> PR-2-PL DOPR-2-PL V-2-PL %
+VP -> PR-3-PL DOPR-3-PL V-3-PL %
+
+NP -> A-M-SG-PRE N-M-SG % 'beau chat'
+NP -> A-M-PL-PRE N-M-PL %
+NP -> A-F-SG-PRE N-F-SG %
+NP -> A-F-PL-PRE N-F-PL %
+
+NP -> N-M-SG A-M-SG-POST % 'chat noir'
+NP -> N-M-PL A-M-PL-POST %
+NP -> N-F-SG A-F-SG-POST %
+NP -> N-F-PL A-F-PL-POST %
+
+PR-1-SG -> je
+PR-2-SG -> tu
+PR-3-SG -> il
+PR-1-PL -> nous
+PR-2-PL -> vous
+PR-3-PL -> ils
+
+DOPR-1-SG -> me
+DOPR-2-SG -> te
+DOPR-3-SG -> le | la
+DOPR-1-PL -> nous
+DOPR-2-PL -> vous
+DOPR-3-PL -> les
+
+DT-M-SG -> le
+DT-F-SG -> la
+DT-PL   -> les
+
+PN -> Jackie | Montréal % proper nouns do not need articles
+
+% vert and grand are here in the figurative sense
+A-M-SG-PRE -> beau   | joli   | heureux   | vert   | grand
+A-M-PL-PRE -> beaux  | jolis  | heureuxs  | verts  | grands
+A-F-SG-PRE -> belle  | jolie  | heureuse  | verte  | grande
+A-F-PL-PRE -> belles | jolies | heureuses | vertes | grandes
+
+% vert and grand are here in the literal sense
+A-M-SG-POST -> intelligent   | vert   | épicé   | noir   | dernier   | grand
+A-M-PL-POST -> intelligents  | verts  | épicés  | noirs  | derniers  | grands
+A-F-SG-POST -> intelligente  | verte  | épicée  | noire  | dernière  | grande
+A-F-PL-POST -> intelligentes | vertes | épicées | noires | dernières | grandes
+
+V-1-SG -> regarde   | mange
+V-2-SG -> regardes  | manges
+V-3-SG -> regarde   | mange
+V-1-PL -> regardons | mangeons
+V-2-PL -> regardez  | mangez
+V-3-PL -> regardent | mangent
+
+N-M-SG -> semaine  | chat  | poisson
+N-M-PL -> semaines | chats | poissons
+N-F-SG -> télévision  | terre
+N-F-PL -> télévisions | terres

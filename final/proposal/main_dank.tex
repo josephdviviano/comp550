@@ -1,0 +1,180 @@
+    % --------------------------------------------------------------
+% This is all preamble stuff that you don't have to worry about.
+% Head down to where it says "Start here"
+% --------------------------------------------------------------
+ 
+\documentclass[12pt]{article}
+ 
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{datetime}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{float}
+\usepackage{blindtext}
+\usepackage{graphicx}
+\usepackage[export]{adjustbox}
+\usepackage{amssymb}
+ \usepackage{booktabs}
+\usepackage[utf8]{inputenc}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{systeme}
+\usepackage[english]{babel}
+\usepackage{algorithm}
+\usepackage{kbordermatrix}
+\usepackage{listings}
+\usepackage{blkarray, bigstrut} 
+\usepackage[noend]{algpseudocode}
+\usepackage {tikz}
+\usetikzlibrary{arrows}
+\usepackage[makeroom]{cancel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\bibliographystyle{IEEEtran}
+\setlength{\parindent}{0in}
+\usepackage{subcaption}
+\usepackage{hyperref}
+
+\newcommand{\ra}{$\rightarrow$}
+
+\algnewcommand\algorithmicforeach{\textbf{for each}}
+\algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
+
+\lstset{basicstyle=\footnotesize}
+
+\def\finf{\stackrel{\infty}{\forall}}
+
+\makeatletter
+\def\BState{\State\hskip-\ALG@thistlm}
+\makeatother
+
+\lstset{
+     literate=%
+         {á}{{\'a}}1
+         {í}{{\'i}}1
+         {é}{{\'e}}1
+         {ý}{{\'y}}1
+         {ú}{{\'u}}1
+         {ó}{{\'o}}1
+         {à}{{\`a}}1
+         {À}{{\`A}}1
+         {ê}{{\'e}}1
+         {ù}{{\`{u}}}1
+         {è}{{\v{e}}}1
+         {š}{{\v{s}}}1 
+         {č}{{\v{c}}}1
+         {ř}{{\v{r}}}1
+         {ž}{{\v{z}}}1
+         {ď}{{\v{d}}}1
+         {ť}{{\v{t}}}1
+         {ň}{{\v{n}}}1                
+         {ů}{{\r{u}}}1
+         {Á}{{\'A}}1
+         {Í}{{\'I}}1
+         {É}{{\'E}}1
+         {Ý}{{\'Y}}1
+         {Ú}{{\'U}}1
+         {Ó}{{\'O}}1
+         {Ě}{{\v{E}}}1
+         {Š}{{\v{S}}}1
+         {Č}{{\v{C}}}1
+         {Ř}{{\v{R}}}1
+         {Ž}{{\v{Z}}}1
+         {Ď}{{\v{D}}}1
+         {Ť}{{\v{T}}}1
+         {Ň}{{\v{N}}}1                
+         {Ů}{{\r{U}}}1    
+}
+
+\makeatletter
+\renewcommand{\Function}[2]{%
+  \csname ALG@cmd@\ALG@L @Function\endcsname{#1}{#2}%
+  \def\jayden@currentfunction{#1}%
+}
+\newcommand{\funclabel}[1]{%
+  \@bsphack
+  \protected@write\@auxout{}{%
+    \string\newlabel{#1}{{\jayden@currentfunction}{\thepage}}%
+  }%
+  \@esphack
+}
+\makeatother
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\HH}{H_{2^m-1}^{(r)}}
+ 
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{exercise}[2][Exercise]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{reflection}[2][Reflection]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{proposition}[2][Proposition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{corollary}[2][Corollary]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+ \renewcommand{\kbldelim}{(}% Left delimiter
+\renewcommand{\kbrdelim}{)}% Right delimiter
+
+%\newdate{date}{15}{11}{2017}
+%\date{\displaydate{date}}
+
+ 
+% --------------------------------------------------------------
+%                         Start here
+% --------------------------------------------------------------
+ 
+%\renewcommand{\qedsymbol}{\filledbox}
+ 
+\title{COMP 550 Project proposal}
+\author{Alejandro Posada \and Joseph D. Viviano}
+
+\begin{document}
+\maketitle
+
+
+You're gonna love this idea: \textbf{Build a sentence-level generative model that also understands syntactic distributions.} Impossible, you say?\\
+
+\Bigg{Wrong} \\
+
+Two years ago some \href{https://arxiv.org/abs/1511.06349}{tight bros} built a generative model for sentences. 
+These \textbf{fire researchers} used an recurrent neural network (RNN)-based variational autoencoder (VAE) 
+generative model that incorperates distributed latent representations of entire sentences. The model was able to
+learn \textit{dope} holistic properties like style, topic, and high-level syntax.
+
+\section{Background}
+
+A standard RNN model predicts each word of a sentence conditioned on the previous word and an evolving hidden state. 
+This is dumb as shit. It can never learn the structure of full sentences and is liable to produce word salad over 
+longer time spans. The variational autoencoder is a \textbf{sexy AF} method for learning a continuous latent space
+using unlabelled data. It imposes a prior distribution on the hidden codes $\vec{z}$, which enforces a regular
+geometry over codes and makes it easier to draw samples from the model. In contrast, the $\vec{z_s}$ learned by
+a standard autoencoder is likely to be a complete piece of shit because the latent space will have more holes than 
+a bag of dank swiss cheese.  \\
+
+Previous work used single-layer long short-term memory (LSTM)-RNNs for both the encoder and decoder, forming a sequence 
+autoencoder with a prior distribution. These motherfuckers ran a few experiments: \\
+
+\begin{itemize}
+    \item Penn Treebank, using the standard train test split, to see whether including the global latent variable $\vec{z}$ 
+          helps or is just a big waste of fucking time, like comp550.
+    \item Missing word imputation, paraphrase detection, and question type classification on the Books Corpus (80m sentences), all using the
+          same methods as \href{http://papers.nips.cc/paper/5950-skip-thought-vectors}{these professional gangsters}.
+\end{itemize} 
+
+What we want to do is replicate these methods, but incorporate a hot new approach for incorporating \textit{damp constraints} on $\vec{z}$.
+Basically, some \textbf{lava buddies} \href{https://arxiv.org/abs/1711.05772}{figured out} how to leverage the semantic space learned by a VAE 
+after unsupervised training. Basically they use a bomb ass actor-critic pair to predict which region of $\vec{z}$ will generate outputs with the 
+desired attributes, which amounts to replacing the decoder $D(x)$ and generator $G(X)$ of the CGAN model with conditional versions $D(z, y)$ and 
+$G(z, y)$, and concatenating $y$ to $z$ as input. If both the actor and critic see the same attribute information, $G$ must find points 
+in latent space that could be samples from $q(\vec{z})$ with attributes $y$. This method allows for \textbf{one shot, one opportunity conditional 
+generation} which is so fucking cool you aren't even invited. \\
+
+You now marvel at our brilliance, as we propose to use \textbf{fly-ass motherfucking part of speech (POS) tags} to draw grammatical sentences
+from the latent space $\vec{z}$, in the same manner as one would draw them from a shitty hidden markov model, except our model will be less 
+shitty.
+
+\end{document}

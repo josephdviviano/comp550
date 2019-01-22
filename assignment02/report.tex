@@ -1,0 +1,414 @@
+%&pdflatex
+%% filename: amsart-template.tex, version: 2.1
+\documentclass{amsart}
+\usepackage{hyperref}
+\usepackage{inputenc}
+\usepackage{graphicx}
+\usepackage{bbm}
+\usepackage{csvsimple}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{xca}[theorem]{Exercise}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\numberwithin{equation}{section}
+\setlength{\parindent}{0pt} % turn off auto-indent
+
+\graphicspath{ {./} }
+
+\begin{document}
+
+\title{Assignment 2: [COMP550]}
+
+\author{Joseph D. Viviano}
+\address{McGill University}
+\curraddr{}
+\email{joseph@viviano.ca}
+\thanks{}
+\date{Sept 2018}
+
+\maketitle
+
+\section{POS Tagging}
+
+Behold, our corpus: \\
+
+\begin{itemize}
+    \item that/C that/N is/V, is/V .
+    \item that/C that/N is/V not/N, is/V not/N .
+    \item is/V that/N it/N ?
+    \item is/V it/N that/N good/J ?
+\end{itemize} \\
+
+The initial probabilities are calculated using only the first
+words from each sentence (so our corpus size for the following
+calculations is 4). The laplace-smoothed initial probabilities are: \\
+
+\begin{align}
+    \pi_C &= \frac{\#C+1}{\#corpus+4} = \frac{3}{8} = 0.375 \\
+    \pi_N &= \frac{\#N+1}{\#corpus+4} = \frac{1}{8} = 0.125 \\
+    \pi_J &= \frac{\#J+1}{\#corpus+4} = \frac{1}{8} = 0.125 \\
+    \pi_V &= \frac{\#V+1}{\#corpus+4} = \frac{3}{8} = 0.375
+\end{align} \\
+
+The lexicon frequencies for the lexicon
+$l = \{that, is, not, it, good\}$ is: \\
+
+\begin{itemize}
+    \item that = 6
+    \item is = 6
+    \item not = 2
+    \item it = 2
+    \item good = 1
+\end{itemize}
+
+The transition probabilities $\alpha$ for the tagset
+$\{C, N, V, J\}$ are: \\
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{l|l|l|l|l}%
+     & C & N & V & J
+    \csvreader[head to column names]{transitions_prob.csv}{}
+    {\\\hline\csvcoli&\csvcolii&\csvcoliii&\csvcoliv&\csvcolv}
+    \end{tabular}%}
+\end{table}
+
+\newpage
+
+The laplace-smoothed transition probabilities $\alpha$ for the tagset $\{C, N, V, J\}$ are: \\
+
+\begin{table}[ht]
+\centering
+%\resizebox{\textwidth}{!}{
+\begin{tabular}{l|l|l|l|l}%
+     & C & N & V & J
+    \csvreader[head to column names]{transitions_smoothed_prob.csv}{}
+    {\\\hline\csvcoli&\csvcolii&\csvcoliii&\csvcoliv&\csvcolv}
+    \end{tabular}%}
+\end{table}
+
+
+The emission probabilities $\beta$ are: \\
+
+\begin{align}
+  C \rightsquigarrow that &= \frac{2}{2} = 1 \\
+  N \rightsquigarrow that &= \frac{4}{8} = 0.5 \\
+  N \rightsquigarrow not  &= \frac{2}{8} = 0.25 \\
+  N \rightsquigarrow it   &= \frac{2}{8} = 0.25 \\
+  V \rightsquigarrow is   &= \frac{6}{6} = 1 \\
+  J \rightsquigarrow good &= \frac{1}{1} = 1
+\end{align} \\
+
+Which we show in full table form here: \\
+
+\begin{table}[ht]
+\centering
+%\resizebox{\textwidth}{!}{
+\begin{tabular}{l|l|l|l|l|l}%
+     & that & is & not & it & good
+    \csvreader[head to column names]{emissions_prob.csv}{}
+    {\\\hline\csvcoli&\csvcolii&\csvcoliii&\csvcoliv&\csvcolv&\csvcolvi}
+    \end{tabular}%}
+\end{table}\\
+
+The smoothed emission probabilities are done per state, so our new
+$\beta$ are: \\
+
+\begin{table}[ht]
+\centering
+%\resizebox{\textwidth}{!}{
+\begin{tabular}{l|l|l|l|l|l}%
+     & that & is & not & it & good
+    \csvreader[head to column names]{emissions_smoothed_prob.csv}{}
+    {\\\hline\csvcoli&\csvcolii&\csvcoliii&\csvcoliv&\csvcolv&\csvcolvi}
+    \end{tabular}%}
+\end{table}
+
+
+When we run the viterbi algo for POS tagging, we get the tagging "that/C is/V good/N.": \\
+
+\begin{table}[ht]
+\resizebox{\textwidth}{!}{\begin{tabular}{l|p{20mm}|p{40mm}|p{40mm}}
+  & that               & is                                                                            & good                                                                          &  \\
+C & \textbf{0.38 * 0.43 = 0.16} & max(0.16*0.17*0.14; 0.05*0.10*0.14; 0.03*0.11*0.14; 0.02*0.25*0.14) = 0.00384 & max(0.00*0.17*0.14; 0.01*0.10*0.14; 0.02*0.11*0.14; 0.00*0.25*0.14) = 0.00027 &  \\
+N & 0.12 * 0.39 = 0.05 & max(0.16*0.50*0.08; 0.05*0.30*0.08; 0.03*0.56*0.08; 0.02*0.25*0.08) = 0.00619 & \textbf{max(0.00*0.50*0.08; 0.01*0.30*0.08; 0.02*0.56*0.08; 0.00*0.25*0.08) = 0.00073} &  \\
+V & 0.38 * 0.09 = 0.03 & \textbf{max(0.16*0.17*0.64; 0.05*0.40*0.64; 0.03*0.22*0.64; 0.02*0.25*0.64) = 0.01709} & max(0.00*0.17*0.09; 0.01*0.40*0.09; 0.02*0.22*0.09; 0.00*0.25*0.09) = 0.00035 &  \\
+J & 0.12 * 0.17 = 0.02 & max(0.16*0.17*0.17; 0.05*0.20*0.17; 0.03*0.11*0.17; 0.02*0.25*0.17) = 0.00449 & max(0.00*0.17*0.33; 0.01*0.20*0.33; 0.02*0.11*0.33; 0.00*0.25*0.33) = 0.00063 &
+\end{tabular}}
+\end{table}
+
+\newpage
+
+Now we consider two new sentences: \\
+
+\begin{enumerate}
+    \item "Bad is not good ."
+    \item "Is it bad ?"
+\end{enumerate} \\
+
+
+First, we generate a new smoothed emission probabilities matrix including the
+word "bad":\\
+
+\begin{table}[ht]
+\centering
+%\resizebox{\textwidth}{!}{
+\begin{tabular}{l|l|l|l|l|l|l}%
+     & that & is & not & it & good & bad
+    \csvreader[head to column names]{emissions_smoothed_prob_newword.csv}{}
+    {\\\hline\csvcoli&\csvcolii&\csvcoliii&\csvcoliv&\csvcolv&\csvcolvi&\csvcolvii}
+    \end{tabular}%}
+\end{table}
+
+
+We then use the expectation maximization algorthms to update previously trained
+model to account for "bad" (i.e., the Baum-Welch algorithm). To do this, we first
+calculate an \textbf{a} matrix using the viterbi algorithm for each sentence: \\
+
+\begin{table}[ht]
+\resizebox{\textwidth}{!}{\begin{tabular}{l|p{20mm}|p{40mm}|p{40mm}|p{40mm}}
+  & bad                & is                                                            & not                                                           & good                                                          &  \\
+C & 0.38 * 0.12 = 0.05 & (0.05*0.17 + 0.01*0.10 + 0.03*0.11 + 0.02*0.25)0.12 = 0.00208 & (0.00*0.17 + 0.00*0.10 + 0.01*0.11 + 0.00*0.25)0.12 = 0.00035 & (0.00*0.17 + 0.00*0.10 + 0.00*0.11 + 0.00*0.25)0.12 = 0.00005 &  \\
+N & 0.12 * 0.07 = 0.01 & (0.05*0.50 + 0.01*0.30 + 0.03*0.56 + 0.02*0.25)0.07 = 0.00342 & (0.00*0.50 + 0.00*0.30 + 0.01*0.56 + 0.00*0.25)0.21 = 0.00216 & (0.00*0.50 + 0.00*0.30 + 0.00*0.56 + 0.00*0.25)0.07 = 0.00008 &  \\
+V & 0.38 * 0.08 = 0.03 & (0.05*0.17 + 0.01*0.40 + 0.03*0.22 + 0.02*0.25)0.58 = 0.01330 & (0.00*0.17 + 0.00*0.40 + 0.01*0.22 + 0.00*0.25)0.08 = 0.00044 & (0.00*0.17 + 0.00*0.40 + 0.00*0.22 + 0.00*0.25)0.08 = 0.00009 &  \\
+J & 0.12 * 0.14 = 0.02 & (0.05*0.17 + 0.01*0.20 + 0.03*0.11 + 0.02*0.25)0.14 = 0.00250 & (0.00*0.17 + 0.00*0.20 + 0.01*0.11 + 0.00*0.25)0.14 = 0.00045 & (0.00*0.17 + 0.00*0.20 + 0.00*0.11 + 0.00*0.25)0.29 = 0.00019 &
+\end{tabular}}
+\end{table} \\
+
+
+\begin{table}[ht]
+\resizebox{\textwidth}{!}{\begin{tabular}{l|p{20mm}|p{40mm}|p{40mm}}
+  & is                 & it                                                            & bad                                                           &  \\
+C & 0.38 * 0.12 = 0.05 & (0.05*0.17 + 0.01*0.10 + 0.22*0.11 + 0.02*0.25)0.12 = 0.00468 & (0.00*0.17 + 0.03*0.10 + 0.01*0.11 + 0.01*0.25)0.12 = 0.00075 &  \\
+N & 0.12 * 0.07 = 0.01 & (0.05*0.50 + 0.01*0.30 + 0.22*0.56 + 0.02*0.25)0.21 = 0.03259 & (0.00*0.50 + 0.03*0.30 + 0.01*0.56 + 0.01*0.25)0.07 = 0.00118 &  \\
+V & 0.38 * 0.58 = 0.22 & (0.05*0.17 + 0.01*0.40 + 0.22*0.22 + 0.02*0.25)0.08 = 0.00537 & (0.00*0.17 + 0.03*0.40 + 0.01*0.22 + 0.01*0.25)0.08 = 0.00137 &  \\
+J & 0.12 * 0.14 = 0.02 & (0.05*0.17 + 0.01*0.20 + 0.22*0.11 + 0.02*0.25)0.14 = 0.00548 & (0.00*0.17 + 0.03*0.20 + 0.01*0.11 + 0.01*0.25)0.14 = 0.00132 &
+\end{tabular}}
+\end{table} \\
+
+\newpage
+
+and our new emission probabilities $\beta$ are (we are omitting all calculations
+beyond this point for clairty, please see attached code for more details): \\
+
+\begin{table}[ht]
+\centering
+%\resizebox{\textwidth}{!}{
+\begin{tabular}{l|l|l|l|l|l}%
+     & bad & is & not & good
+    \csvreader[head to column names]{betas_em_0.csv}{}
+    {\\\hline\csvcoli&\csvcolii&\csvcoliii&\csvcoliv&\csvcolv}
+    \end{tabular}%}
+\end{table}\\
+
+\begin{table}[ht]
+\centering
+%\resizebox{\textwidth}{!}{
+\begin{tabular}{l|l|l|l|l|l}%
+     & is & it & bad
+    \csvreader[head to column names]{betas_em_1.csv}{}
+    {\\\hline\csvcoli&\csvcolii&\csvcoliii&\csvcoliv}
+    \end{tabular}%}
+\end{table}\\
+
+\newpage
+
+This allows us to calculate the $p(O | \theta)$ which is
+$0.00041908$ and $0.0046167$ for each sentence respectively.\\
+
+We next calculate gamma, the probability of being in state $i$ at
+time $t$ given the input sequence and the model, and xi, the
+probability of transitioning from state $i$ at time $t$ to state
+$j$ at $t+1$. We present the former below for both input sequences,
+the latter being to large to reproduce (see the attached code for
+details). \\
+
+\begin{table}[ht]
+\centering
+%\resizebox{\textwidth}{!}{
+\begin{tabular}{l|l|l|l|l|l}%
+     & bad & is & not & good
+    \csvreader[head to column names]{gamma_em_0.csv}{}
+    {\\\hline\csvcoli&\csvcolii&\csvcoliii&\csvcoliv&\csvcolv}
+    \end{tabular}%}
+\end{table}\\
+
+
+\begin{table}[ht]
+\centering
+%\resizebox{\textwidth}{!}{
+\begin{tabular}{l|l|l|l|l|l}%
+     & is & it & bad
+    \csvreader[head to column names]{gamma_em_1.csv}{}
+    {\\\hline\csvcoli&\csvcolii&\csvcoliii&\csvcoliv}
+    \end{tabular}%}
+\end{table}\\
+
+From these values, we can then maximize the likelihood of the training
+data given expected counts we just calculated, and use these values to
+derrive new initial parameters, a, and $\beta$ matrix: \\
+
+\begin{align}
+    \pi_C &= 0.275 \\
+    \pi_N &= 0.076 \\
+    \pi_J &= 0.124 \\
+    \pi_V &= 0.525
+\end{align} \\
+
+\begin{table}[ht]
+\centering
+%\resizebox{\textwidth}{!}{
+\begin{tabular}{l|l|l|l|l}%
+     & C & N & V & J
+    \csvreader[head to column names]{new_a_em.csv}{}
+    {\\\hline\csvcoli&\csvcolii&\csvcoliii&\csvcoliv&\csvcolv}
+    \end{tabular}%}
+\end{table} \\
+
+\begin{table}[ht]
+\centering
+%\resizebox{\textwidth}{!}{
+\begin{tabular}{l|l|l|l|l|l|l}%
+     & that & is & not & it & good & bad
+    \csvreader[head to column names]{new_B_em.csv}{}
+    {\\\hline\csvcoli&\csvcolii&\csvcoliii&\csvcoliv&\csvcolv&\csvcolvi&\csvcolvii}
+    \end{tabular}%}
+\end{table} \\
+
+\newpage
+
+This solution assigns probability $0.00251934$ to the new input sequence "that is bad"
+(found using the forward algorithm followed by summing the final column of the a matrix).
+
+\section{French Context Free Grammar}
+
+We used the following 35 nonterminal items to generate the grammar found in
+\textbf{grammar.txt}: \\
+
+\begin{itemize}
+    \item \textbf{S} sentence
+    \item \textbf{NP} noun phrase
+    \item \textbf{VP} verb phrase
+    \item \textbf{N-M-SG} noun male singular
+    \item \textbf{N-F-SG} noun female singular
+    \item \textbf{N-M-SG} noun male plural
+    \item \textbf{N-F-SG} noun female plural
+    \item \textbf{N-PL} noun plural
+    \item \textbf{DT-M-SG} determiner male singular
+    \item \textbf{DT-F-SG} determiner female singular
+    \item \textbf{DT-PL} determiner plural
+    \item \textbf{PR-1-SG} pronoun first-person singular
+    \item \textbf{PR-2-SG} pronoun second-person singular
+    \item \textbf{PR-3-SG} pronoun third-person singular
+    \item \textbf{PR-1-PL} pronoun first-person plural
+    \item \textbf{PR-2-PL} pronoun second-person plural
+    \item \textbf{PR-3-PL} pronoun third-person plural
+    \item \textbf{V-1-SG} verb first-person singluar
+    \item \textbf{V-2-SG} verb second-person singluar
+    \item \textbf{V-3-SG} verb third-person singluar
+    \item \textbf{V-1-PL} verb first-person plural
+    \item \textbf{V-2-PL} verb second-person plural
+    \item \textbf{V-3-PL} verb third-person plural
+    \item \textbf{DOPR-1-SG} direct object pronoun first-person singular
+    \item \textbf{DOPR-2-SG} direct object pronoun second-person singular
+    \item \textbf{DOPR-3-SG} direct object pronoun third-person singular
+    \item \textbf{DOPR-1-PL} direct object pronoun first-person plural
+    \item \textbf{DOPR-2-PL} direct object pronoun second-person plural
+    \item \textbf{DOPR-3-PL} direct object pronoun third-person plural
+    \item \textbf{PN} proper noun
+    \item \textbf{A-M-SG-PRE} adjective male singular pre-noun
+    \item \textbf{A-F-SG-PRE} adjective female singular pre-noun
+    \item \textbf{A-M-PL-PRE} adjective male plural pre-noun
+    \item \textbf{A-F-PL-PRE} adjective female plural pre-noun
+    \item \textbf{A-M-SG-POST} adjective male singular post-noun
+    \item \textbf{A-F-SG-POST} adjective female singular post-noun
+    \item \textbf{A-M-PL-POST} adjective male plural post-noun
+    \item \textbf{A-F-PL-POST} adjective female plural post-noun
+\end{itemize} \\
+
+\subsection{What are some advantages of modelling French grammar with a CFG, compared to using an FSA?}
+
+CFGs are capable of modelling a much larger number of sentences with the same number of rules. With an
+FSA, we were forced to define a rule for each character. With CGFs, we can define rules at the word
+level. Even though we end up with some duplicate terminal words in the rule set, the rule set is much more compact than the equivilant FSA would have been. Furthermore, the grammar is much easier for
+another person to review and expand upon. \\
+
+\subsection{What are some disadvantages of modelling French grammar with a CFG?}
+
+CFGs still lead to an enormous explosion of rules very quickly when trying to deal with the edge cases of French grammar. Many rules end up pointing to only one or two specific terminal words. Therefore this approach seems unlikely to scale to the French language as practiced. \\
+
+\subsection{What are some aspects of French grammar that your CFG does not handle?}
+
+This CFG does not handle conjugation properly (e.g., \textit{"il n'y a pas"}), nor does it handle negation (\textit{ne + [verb] + pas}). It also has no functionality to cover the different tenses
+(past, present, future, future perfect, etc.) \\
+
+\section{Book Report}
+
+\subsection{Summary.}
+
+The authors investigated whether \textit{lexicalization} helps the
+performance of probabilistic context free grammars (PCFGs) or not. Lexicalization 
+refers to using \textit{head words} to annotate phrasal nodes. Another 
+\textit{unlexicalized} approach is to annotate every node by it's parent category. 
+The paper shows that unlexical annotation can approach the performance of lexicalized 
+PCFGs.\\
+
+Models were trained on sections 2-21 of the \textbf{WSJ} section of the Penn
+Treebank. The first 393 sentences of section 22 were used as the
+development set. Section 23 was used as a test set. Unsmoothed maximum-likelihood
+estimates were used for rule probabilities, and grammar parsing was done using
+the CKY parser. The optimal tag sets were selected in this environment.\\
+
+The authors present an analysis showing the effect advantage of multiple 
+annotation approaches (i.e., how many parent levels to tag in the lexicon). They
+largely show an advantage of tagging words with their parent context.\\
+
+The authors then show a series of annotations that split the symbol space into 
+finer categories. They created a new tag to indicate when a production was
+only meaningful in locally (replacing head node annotation in lexicalized 
+PCFGs), created two special tags distinguishing determiners from demonstratives. 
+They found that tagging each part of speech  (POS) with the the parent's POS as 
+well was useful. Many changes were very specific: e.g., splitting the word 
+\textit{in} to account for the  unique usage as a conjugation, complementizer, 
+and preposition.\\
+
+The authors also experimented with pushing parent-tag data down to the preterminal level
+of the parse tree. They marked head words that predict constituent's behaviour
+(e.g., possessive noun phrases). They split verb phrases using head tags, and tags 
+denoting attachment/conjunction distance between words (e.g., noun phrases followed by 
+multiple adjectives) using a \textbf{DOMINATES-X} tag, which encodes verbal distance 
+between some tag tag, and tag \textbf{X}.\\
+
+\subsection{Evaluation.}
+
+Advantages: They claim that these models are preferable to lexicalized PCFGs because 
+the lower bound on the grammar's capacity can be better defined, the grammar 
+itself is easier to understand, more compact (9255 states), easier to build 
+(no lexicalization of content words), and more easily optimized.\\ 
+
+Limitations: Hard to build on this work because the 1636 additions to the grammar
+are not detailed. Authors give little insight into the tag that were 
+rejected during model-selection. They also did not test their model on an external 
+corpus with a different scope (e.g., non-financial news), so some of their new tags
+may not have broad relevance.\\
+
+Relevance to class: This work shows that encoding the relationships between words in context 
+(parent annotation, domination, pushing functional tags down) is key for good models, 
+and that linguistic insights can be useful for both feature engineering and error 
+analysis.\\
+
+\subsection{3 Questions:}\\ 
+
+\begin{itemize}
+    \item{Does increasing the number of closed-class word tags hurt generalization to 
+          datasets from other domains?}
+    \item{What would happen if model selection preferred models with less rules?}
+    \item{Is there an explanation for why marking all preterminals was the most useful 
+          annotation strategy?}
+\end{itemize}
+\end{document}
